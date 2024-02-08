@@ -1,0 +1,42 @@
+
+       body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        h2 {
+            color: #ff6347;
+            text-align: center;
+        }
+
+        label {
+            align-items: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"],
+        input[type="reset"] {
+            width: 150px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }

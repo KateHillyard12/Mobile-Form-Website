@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>GIMM 285 Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    
+</head>
+
+<body>
+    <h1>Mobile Form Website</h1>
+    <div id='invalid-form' class='alert alert-danger'>&nbsp;</div>
+    <hr />
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>BORDERLANDS</h2>
+                <form id="borderlandsForm">
+                    <label for="chara">Which character do you play?</label>
+                    <select id="chara">
+                        <option value="none"></option>
+                        <option value="Brr">Brr-Zerker</option>
+                        <option value="Claw">Clawbringer</option>
+                        <option value="Grave">Graveborn</option>
+                        <option value="Spell">Spellshot</option>
+                        <option value="Spore">Spore Warden</option>
+                        <option value="Stab">Stabbomancer</option>
+                    </select>
+                    <div class="row mb-3">
+                        <div id='chara-error' class='col-12 text-danger'>&nbsp;</div>
+                    </div>
+                    
+                    <label for="file">What is your favorite gun?</label>
+                    <input type="file" id="file">
+                    <div class="row mb-3">
+                        <div id='file-error' class='col-12 text-danger'>&nbsp;</div>
+                    </div>
+                    
+                    <label for="played">Have you played legendary mode?</label>
+                    <select id="played">
+                        <option value="none"></option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                    <div class="row mb-3">
+                        <div id='played-error' class='col-12 text-danger'>&nbsp;</div>
+                    </div>
+                    
+                    <label for="WGame">Which game is your favorite?</label>
+                    <input type="text" id="WGame">
+                    <div class="row mb-3">
+                        <div id='WGame-error' class='col-12 text-danger'>&nbsp;</div>
+                    </div>
+                    
+                    <label for="element">What is your favorite gun element?</label>
+                    <select id="element">
+                        <option value="none"></option>
+                        <option value="Inc">Incendiary</option>
+                        <option value="Cor">Corrosive</option>
+                        <option value="Sho">Shock</option>
+                        <option value="Exp">Explosive</option>
+                        <option value="Cry">Cryo</option>
+                        <option value="Rad">Radiation</option>
+                    </select>
+                    <div class="row mb-3">
+                        <div id='element-error' class='col-12 text-danger'>&nbsp;</div>
+                    </div>
+                    
+                    <label for="HPlayed">How many hours have you played?</label>
+                    <input type="text" id="HPlayed">
+                    <div class="row mb-3">
+                        <div id='HPlayed-error' class='col-12 text-danger'>&nbsp;</div>
+                    </div>
+                    
+                </form>
+            </div>
+
+            <div class='row'>
+                <div class='col-md-12'>
+                    <button id='submit'>Submit</button>
+                </div>
+            </div>
+            <div id="valid-form" class="correct">&nbsp;</div>
+        </div>
+        <div class="container mt-5">
+            <h2>Submissions</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Character</th>
+                        <th>Favorite Gun</th>
+                        <th>Played Legendary Mode</th>
+                        <th>Favorite Game</th>
+                        <th>Favorite Gun Element</th>
+                        <th>Hours Played</th>
+                    </tr>
+                </thead>
+                <tbody id="submissionsBody">
+                    <!-- Submissions will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const errorBanner = document.getElementById('invalid-form');
+        errorBanner.hidden = true;
+        const successBanner = document.getElementById('valid-form');
+        successBanner.hidden = true;
+
+        document.getElementById('submit').addEventListener("click", () => {
+            const fileField = document.querySelector('input[type="file"]');
+        
+
+            const formData = new FormData();
+            formData.append('chara', document.getElementById('chara').value);
+            formData.append('file', fileField.files[0]);
+            formData.append('played', document.getElementById('played').value);
+            formData.append('WGame', document.getElementById('WGame').value);
+            formData.append('element', document.getElementById('element').value);
+            formData.append('HPlayed', document.getElementById('HPlayed').value);
+
+
+            let fetchSettings = {
+                method: 'POST',
+                body: formData
+            };
+
+            fetch("http://localhost/", fetchSettings)
+                .then((response) => {
+                    return new Promise((resolve) => response.json()
+                        .then((json) => resolve({
+                            status: response.status,
+                            json,
+                        })
+                        ));
+                })
+                //Logic to display errors on form 
+                .then(({ status, json }) => {
+                    const errorMessages = document.getElementsByClassName('text-danger');
+                    errorBanner.hidden = true;
+                    for (htmlElement of errorMessages) {
+                        htmlElement.innerHTML = '&nbsp;';
+                    }
+                    if (status === 400) {
+                        errorBanner.innerText = 'Form has errors. Please correct them and resubmit.';
+                        errorBanner.hidden = false;
+                        for (error of json.errors) {
+                            const errorId = error.path + '-error';
+                            document.getElementById(errorId).innerHTML = error.msg
+                        }
+                    }
+                    else {
+                        successBanner.innerText = 'Form is Complete and Submited.';
+                        successBanner.hidden = false;
+                          fetchAndDisplaySubmissions();
+                    }
+                })
+                .catch(error => {
+        console.error('Error:', error);
+        // Handle the error here, such as displaying a message to the user
+        // or taking other appropriate actions.
+    });
+        })
+        function fetchAndDisplaySubmissions() {
+            fetch("http://localhost/") // Assuming your server is running on localhost
+                .then(response => response.json())
+                .then(data => {
+                    const submissions = data.submissions;
+                    const submissionsBody = document.getElementById('submissionsBody');
+
+                    // Clear previous data
+                    submissionsBody.innerHTML = '';
+
+                    // Iterate over submissions and add to table
+                    submissions.forEach(submission => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${submission.chara}</td>
+                            <td><img src="uploads/${submission.file}" width="50" height="50"></td>
+                            <td>${submission.played}</td>
+                            <td>${submission.WGame}</td>
+                            <td>${submission.element}</td>
+                            <td>${submission.HPlayed}</td>
+                        `;
+                        submissionsBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            return;
+        }
+
+        // Call function to fetch and display submissions on page load
+      
+    </script>
+</body>
+
+</html>
